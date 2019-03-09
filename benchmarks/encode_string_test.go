@@ -2,8 +2,9 @@ package test
 
 import (
 	"bytes"
-	"github.com/json-iterator/go"
 	"testing"
+
+	jsoniter "github.com/json-iterator/go"
 )
 
 func Benchmark_encode_string_with_SetEscapeHTML(b *testing.B) {
@@ -18,7 +19,7 @@ func Benchmark_encode_string_with_SetEscapeHTML(b *testing.B) {
 		buf := &bytes.Buffer{}
 		enc := json.NewEncoder(buf)
 		enc.SetEscapeHTML(true)
-		if err := enc.Encode(V{S: "s", B: true, I: 233}); err != nil {
+		if err := enc.Encode(V{S: "s", B: true, I: 233}, 0); err != nil {
 			b.Fatal(err)
 		}
 	}

@@ -142,7 +142,7 @@ func (any *arrayLazyAny) Size() int {
 	return size
 }
 
-func (any *arrayLazyAny) WriteTo(stream *Stream) {
+func (any *arrayLazyAny) WriteTo(stream *Stream, depth int) {
 	stream.Write(any.buf)
 }
 
@@ -269,8 +269,8 @@ func (any *arrayAny) Size() int {
 	return any.val.Len()
 }
 
-func (any *arrayAny) WriteTo(stream *Stream) {
-	stream.WriteVal(any.val)
+func (any *arrayAny) WriteTo(stream *Stream, depth int) {
+	stream.WriteVal(any.val, depth)
 }
 
 func (any *arrayAny) GetInterface() interface{} {

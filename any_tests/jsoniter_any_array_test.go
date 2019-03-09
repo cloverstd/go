@@ -3,7 +3,7 @@ package any_tests
 import (
 	"testing"
 
-	"github.com/json-iterator/go"
+	jsoniter "github.com/json-iterator/go"
 	"github.com/stretchr/testify/require"
 )
 
@@ -40,7 +40,7 @@ func Test_read_two_element_array_as_any(t *testing.T) {
 	should.Equal(1, any.ToInt())
 	should.Equal([]interface{}{float64(1), float64(2)}, any.GetInterface())
 	stream := jsoniter.NewStream(jsoniter.ConfigDefault, nil, 32)
-	any.WriteTo(stream)
+	any.WriteTo(stream, 0)
 	should.Equal("[1,2]", string(stream.Buffer()))
 	arr := []int{}
 	any.ToVal(&arr)

@@ -180,7 +180,7 @@ func (cfg Config) frozeWithCacheReuse(extraExtensions []Extension) *frozenConfig
 }
 
 func (cfg *frozenConfig) validateJsonRawMessage(extension EncoderExtension) {
-	encoder := &funcEncoder{func(ptr unsafe.Pointer, stream *Stream) {
+	encoder := &funcEncoder{func(ptr unsafe.Pointer, stream *Stream, depth int) {
 		rawMessage := *(*json.RawMessage)(ptr)
 		iter := cfg.BorrowIterator([]byte(rawMessage))
 		iter.Read()
@@ -228,7 +228,7 @@ func (cfg *frozenConfig) RegisterExtension(extension Extension) {
 type lossyFloat32Encoder struct {
 }
 
-func (encoder *lossyFloat32Encoder) Encode(ptr unsafe.Pointer, stream *Stream) {
+func (encoder *lossyFloat32Encoder) Encode(ptr unsafe.Pointer, stream *Stream, depth int) {
 	stream.WriteFloat32Lossy(*((*float32)(ptr)))
 }
 
@@ -239,7 +239,7 @@ func (encoder *lossyFloat32Encoder) IsEmpty(ptr unsafe.Pointer) bool {
 type lossyFloat64Encoder struct {
 }
 
-func (encoder *lossyFloat64Encoder) Encode(ptr unsafe.Pointer, stream *Stream) {
+func (encoder *lossyFloat64Encoder) Encode(ptr unsafe.Pointer, stream *Stream, depth int) {
 	stream.WriteFloat64Lossy(*((*float64)(ptr)))
 }
 
@@ -258,7 +258,7 @@ func (cfg *frozenConfig) marshalFloatWith6Digits(extension EncoderExtension) {
 type htmlEscapedStringEncoder struct {
 }
 
-func (encoder *htmlEscapedStringEncoder) Encode(ptr unsafe.Pointer, stream *Stream) {
+func (encoder *htmlEscapedStringEncoder) Encode(ptr unsafe.Pointer, stream *Stream, depth int) {
 	str := *((*string)(ptr))
 	stream.WriteStringWithHTMLEscaped(str)
 }
@@ -286,7 +286,8 @@ func (cfg *frozenConfig) cleanEncoders() {
 func (cfg *frozenConfig) MarshalToString(v interface{}) (string, error) {
 	stream := cfg.BorrowStream(nil)
 	defer cfg.ReturnStream(stream)
-	stream.WriteVal(v)
+	// TODO(cloverstd):  depth++
+	stream.WriteVal(v, 0)
 	if stream.Error != nil {
 		return "", stream.Error
 	}
@@ -296,7 +297,8 @@ func (cfg *frozenConfig) MarshalToString(v interface{}) (string, error) {
 func (cfg *frozenConfig) Marshal(v interface{}) ([]byte, error) {
 	stream := cfg.BorrowStream(nil)
 	defer cfg.ReturnStream(stream)
-	stream.WriteVal(v)
+	// TODO(cloverstd): depth++
+	stream.WriteVal(v, 0)
 	if stream.Error != nil {
 		return nil, stream.Error
 	}

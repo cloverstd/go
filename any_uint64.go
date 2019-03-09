@@ -61,7 +61,7 @@ func (any *uint64Any) ToString() string {
 	return strconv.FormatUint(any.val, 10)
 }
 
-func (any *uint64Any) WriteTo(stream *Stream) {
+func (any *uint64Any) WriteTo(stream *Stream, depth int) {
 	stream.WriteUint64(any.val)
 }
 

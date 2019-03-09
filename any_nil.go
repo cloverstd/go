@@ -56,7 +56,7 @@ func (any *nilAny) ToString() string {
 	return ""
 }
 
-func (any *nilAny) WriteTo(stream *Stream) {
+func (any *nilAny) WriteTo(stream *Stream, depth int) {
 	stream.WriteNil()
 }
 

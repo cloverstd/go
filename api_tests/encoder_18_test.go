@@ -8,7 +8,7 @@ import (
 	"testing"
 	"unicode/utf8"
 
-	"github.com/json-iterator/go"
+	jsoniter "github.com/json-iterator/go"
 	"github.com/stretchr/testify/require"
 )
 
@@ -22,7 +22,7 @@ func Test_new_encoder(t *testing.T) {
 	buf2 := &bytes.Buffer{}
 	encoder2 := jsoniter.NewEncoder(buf2)
 	encoder2.SetEscapeHTML(false)
-	encoder2.Encode([]int{1})
+	encoder2.Encode([]int{1}, 0)
 	should.Equal("[1]\n", buf2.String())
 }
 

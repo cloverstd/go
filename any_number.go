@@ -112,7 +112,7 @@ func (any *numberLazyAny) ToString() string {
 	return *(*string)(unsafe.Pointer(&any.buf))
 }
 
-func (any *numberLazyAny) WriteTo(stream *Stream) {
+func (any *numberLazyAny) WriteTo(stream *Stream, depth int) {
 	stream.Write(any.buf)
 }
 

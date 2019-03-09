@@ -2,12 +2,13 @@ package test
 
 import (
 	"bytes"
-	"github.com/json-iterator/go"
-	"github.com/stretchr/testify/require"
 	"strconv"
 	"testing"
 	"time"
 	"unsafe"
+
+	jsoniter "github.com/json-iterator/go"
+	"github.com/stretchr/testify/require"
 )
 
 func Test_customize_type_decoder(t *testing.T) {
@@ -36,7 +37,7 @@ func Test_customize_byte_array_encoder(t *testing.T) {
 	t.Skip()
 	//jsoniter.ConfigDefault.(*frozenConfig).cleanEncoders()
 	should := require.New(t)
-	jsoniter.RegisterTypeEncoderFunc("[]uint8", func(ptr unsafe.Pointer, stream *jsoniter.Stream) {
+	jsoniter.RegisterTypeEncoderFunc("[]uint8", func(ptr unsafe.Pointer, stream *jsoniter.Stream, depth int) {
 		t := *((*[]byte)(ptr))
 		stream.WriteString(string(t))
 	}, nil)

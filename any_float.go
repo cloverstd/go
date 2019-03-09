@@ -74,7 +74,7 @@ func (any *floatAny) ToString() string {
 	return strconv.FormatFloat(any.val, 'E', -1, 64)
 }
 
-func (any *floatAny) WriteTo(stream *Stream) {
+func (any *floatAny) WriteTo(stream *Stream, depth int) {
 	stream.WriteFloat64(any.val)
 }
 

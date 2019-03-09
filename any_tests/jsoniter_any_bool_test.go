@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/json-iterator/go"
+	jsoniter "github.com/json-iterator/go"
 	"github.com/stretchr/testify/require"
 )
 
@@ -52,13 +52,13 @@ func Test_write_bool_to_stream(t *testing.T) {
 	should := require.New(t)
 	any := jsoniter.Get([]byte("true"))
 	stream := jsoniter.NewStream(jsoniter.ConfigDefault, nil, 32)
-	any.WriteTo(stream)
+	any.WriteTo(stream, 0)
 	should.Equal("true", string(stream.Buffer()))
 	should.Equal(any.ValueType(), jsoniter.BoolValue)
 
 	any = jsoniter.Get([]byte("false"))
 	stream = jsoniter.NewStream(jsoniter.ConfigDefault, nil, 32)
-	any.WriteTo(stream)
+	any.WriteTo(stream, 0)
 	should.Equal("false", string(stream.Buffer()))
 
 	should.Equal(any.ValueType(), jsoniter.BoolValue)

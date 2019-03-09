@@ -3,7 +3,7 @@ package any_tests
 import (
 	"testing"
 
-	"github.com/json-iterator/go"
+	jsoniter "github.com/json-iterator/go"
 	"github.com/stretchr/testify/require"
 )
 
@@ -95,7 +95,7 @@ func Test_wrap_and_valuetype_everything(t *testing.T) {
 	should.Equal(i, any.GetInterface())
 
 	stream := jsoniter.NewStream(jsoniter.ConfigDefault, nil, 32)
-	any.WriteTo(stream)
+	any.WriteTo(stream, 0)
 	should.Equal("null", string(stream.Buffer()))
 	should.Equal(any.LastError(), nil)
 

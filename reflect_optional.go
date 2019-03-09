@@ -1,9 +1,10 @@
 package jsoniter
 
 import (
-	"github.com/modern-go/reflect2"
 	"reflect"
 	"unsafe"
+
+	"github.com/modern-go/reflect2"
 )
 
 func decoderOfOptional(ctx *ctx, typ reflect2.Type) ValDecoder {
@@ -67,11 +68,11 @@ type OptionalEncoder struct {
 	ValueEncoder ValEncoder
 }
 
-func (encoder *OptionalEncoder) Encode(ptr unsafe.Pointer, stream *Stream) {
+func (encoder *OptionalEncoder) Encode(ptr unsafe.Pointer, stream *Stream, depth int) {
 	if *((*unsafe.Pointer)(ptr)) == nil {
 		stream.WriteNil()
 	} else {
-		encoder.ValueEncoder.Encode(*((*unsafe.Pointer)(ptr)), stream)
+		encoder.ValueEncoder.Encode(*((*unsafe.Pointer)(ptr)), stream, depth)
 	}
 }
 
@@ -83,11 +84,11 @@ type dereferenceEncoder struct {
 	ValueEncoder ValEncoder
 }
 
-func (encoder *dereferenceEncoder) Encode(ptr unsafe.Pointer, stream *Stream) {
+func (encoder *dereferenceEncoder) Encode(ptr unsafe.Pointer, stream *Stream, depth int) {
 	if *((*unsafe.Pointer)(ptr)) == nil {
 		stream.WriteNil()
 	} else {
-		encoder.ValueEncoder.Encode(*((*unsafe.Pointer)(ptr)), stream)
+		encoder.ValueEncoder.Encode(*((*unsafe.Pointer)(ptr)), stream, depth)
 	}
 }
 
@@ -116,8 +117,8 @@ type referenceEncoder struct {
 	encoder ValEncoder
 }
 
-func (encoder *referenceEncoder) Encode(ptr unsafe.Pointer, stream *Stream) {
-	encoder.encoder.Encode(unsafe.Pointer(&ptr), stream)
+func (encoder *referenceEncoder) Encode(ptr unsafe.Pointer, stream *Stream, depth int) {
+	encoder.encoder.Encode(unsafe.Pointer(&ptr), stream, depth)
 }
 
 func (encoder *referenceEncoder) IsEmpty(ptr unsafe.Pointer) bool {

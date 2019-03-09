@@ -1,18 +1,19 @@
 package jsoniter
 
 import (
-	"github.com/modern-go/reflect2"
 	"reflect"
 	"unsafe"
+
+	"github.com/modern-go/reflect2"
 )
 
 type dynamicEncoder struct {
 	valType reflect2.Type
 }
 
-func (encoder *dynamicEncoder) Encode(ptr unsafe.Pointer, stream *Stream) {
+func (encoder *dynamicEncoder) Encode(ptr unsafe.Pointer, stream *Stream, depth int) {
 	obj := encoder.valType.UnsafeIndirect(ptr)
-	stream.WriteVal(obj)
+	stream.WriteVal(obj, depth)
 }
 
 func (encoder *dynamicEncoder) IsEmpty(ptr unsafe.Pointer) bool {

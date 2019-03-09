@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/json-iterator/go"
+	jsoniter "github.com/json-iterator/go"
 	"github.com/stretchr/testify/require"
 )
 
@@ -47,7 +47,7 @@ func Test_write_val_int(t *testing.T) {
 	should := require.New(t)
 	buf := &bytes.Buffer{}
 	stream := jsoniter.NewStream(jsoniter.ConfigDefault, buf, 4096)
-	stream.WriteVal(1001)
+	stream.WriteVal(1001, 0)
 	stream.Flush()
 	should.Nil(stream.Error)
 	should.Equal("1001", buf.String())
@@ -58,7 +58,7 @@ func Test_write_val_int_ptr(t *testing.T) {
 	buf := &bytes.Buffer{}
 	stream := jsoniter.NewStream(jsoniter.ConfigDefault, buf, 4096)
 	val := 1001
-	stream.WriteVal(&val)
+	stream.WriteVal(&val, 0)
 	stream.Flush()
 	should.Nil(stream.Error)
 	should.Equal("1001", buf.String())

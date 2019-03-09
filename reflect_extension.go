@@ -2,12 +2,13 @@ package jsoniter
 
 import (
 	"fmt"
-	"github.com/modern-go/reflect2"
 	"reflect"
 	"sort"
 	"strings"
 	"unicode"
 	"unsafe"
+
+	"github.com/modern-go/reflect2"
 )
 
 var typeDecoders = map[string]ValDecoder{}
@@ -178,8 +179,8 @@ type funcEncoder struct {
 	isEmptyFunc func(ptr unsafe.Pointer) bool
 }
 
-func (encoder *funcEncoder) Encode(ptr unsafe.Pointer, stream *Stream) {
-	encoder.fun(ptr, stream)
+func (encoder *funcEncoder) Encode(ptr unsafe.Pointer, stream *Stream, depth int) {
+	encoder.fun(ptr, stream, depth)
 }
 
 func (encoder *funcEncoder) IsEmpty(ptr unsafe.Pointer) bool {
@@ -193,7 +194,7 @@ func (encoder *funcEncoder) IsEmpty(ptr unsafe.Pointer) bool {
 type DecoderFunc func(ptr unsafe.Pointer, iter *Iterator)
 
 // EncoderFunc the function form of TypeEncoder
-type EncoderFunc func(ptr unsafe.Pointer, stream *Stream)
+type EncoderFunc func(ptr unsafe.Pointer, stream *Stream, depth int)
 
 // RegisterTypeDecoderFunc register TypeDecoder for a type with function
 func RegisterTypeDecoderFunc(typ string, fun DecoderFunc) {

@@ -128,7 +128,7 @@ func (any *objectLazyAny) Size() int {
 	return size
 }
 
-func (any *objectLazyAny) WriteTo(stream *Stream) {
+func (any *objectLazyAny) WriteTo(stream *Stream, depth int) {
 	stream.Write(any.buf)
 }
 
@@ -249,8 +249,8 @@ func (any *objectAny) Size() int {
 	return any.val.NumField()
 }
 
-func (any *objectAny) WriteTo(stream *Stream) {
-	stream.WriteVal(any.val)
+func (any *objectAny) WriteTo(stream *Stream, depth int) {
+	stream.WriteVal(any.val, depth)
 }
 
 func (any *objectAny) GetInterface() interface{} {
@@ -365,8 +365,8 @@ func (any *mapAny) Size() int {
 	return any.val.Len()
 }
 
-func (any *mapAny) WriteTo(stream *Stream) {
-	stream.WriteVal(any.val)
+func (any *mapAny) WriteTo(stream *Stream, depth int) {
+	stream.WriteVal(any.val, depth)
 }
 
 func (any *mapAny) GetInterface() interface{} {

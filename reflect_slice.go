@@ -2,9 +2,10 @@ package jsoniter
 
 import (
 	"fmt"
-	"github.com/modern-go/reflect2"
 	"io"
 	"unsafe"
+
+	"github.com/modern-go/reflect2"
 )
 
 func decoderOfSlice(ctx *ctx, typ reflect2.Type) ValDecoder {
@@ -24,7 +25,7 @@ type sliceEncoder struct {
 	elemEncoder ValEncoder
 }
 
-func (encoder *sliceEncoder) Encode(ptr unsafe.Pointer, stream *Stream) {
+func (encoder *sliceEncoder) Encode(ptr unsafe.Pointer, stream *Stream, depth int) {
 	if encoder.sliceType.UnsafeIsNil(ptr) {
 		stream.WriteNil()
 		return
@@ -34,15 +35,19 @@ func (encoder *sliceEncoder) Encode(ptr unsafe.Pointer, stream *Stream) {
 		stream.WriteEmptyArray()
 		return
 	}
+	if depth++; depth > MaxDepth {
+		stream.Error = newMaxDepthError(depth)
+		return
+	}
 	stream.WriteArrayStart()
-	encoder.elemEncoder.Encode(encoder.sliceType.UnsafeGetIndex(ptr, 0), stream)
+	encoder.elemEncoder.Encode(encoder.sliceType.UnsafeGetIndex(ptr, 0), stream, depth)
 	for i := 1; i < length; i++ {
 		stream.WriteMore()
 		elemPtr := encoder.sliceType.UnsafeGetIndex(ptr, i)
-		encoder.elemEncoder.Encode(elemPtr, stream)
+		encoder.elemEncoder.Encode(elemPtr, stream, depth)
 	}
 	stream.WriteArrayEnd()
-	if stream.Error != nil && stream.Error != io.EOF {
+	if stream.Error != nil && stream.Error != io.EOF && !IsMaxDepthError(stream.Error) {
 		stream.Error = fmt.Errorf("%v: %s", encoder.sliceType, stream.Error.Error())
 	}
 }

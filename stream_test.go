@@ -1,8 +1,9 @@
 package jsoniter
 
 import (
-	"github.com/stretchr/testify/require"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func Test_writeByte_should_grow_buffer(t *testing.T) {
@@ -32,7 +33,7 @@ func Test_writeBytes_should_grow_buffer(t *testing.T) {
 func Test_writeIndention_should_grow_buffer(t *testing.T) {
 	should := require.New(t)
 	stream := NewStream(Config{IndentionStep: 2}.Froze(), nil, 1)
-	stream.WriteVal([]int{1, 2, 3})
+	stream.WriteVal([]int{1, 2, 3}, 0)
 	should.Equal("[\n  1,\n  2,\n  3\n]", string(stream.Buffer()))
 }
 
@@ -63,7 +64,7 @@ func (w *NopWriter) Write(p []byte) (n int, err error) {
 
 func Test_flush_buffer_should_stop_grow_buffer(t *testing.T) {
 	writer := new(NopWriter)
-	NewEncoder(writer).Encode(make([]int, 10000000))
+	NewEncoder(writer).Encode(make([]int, 10000000), 0)
 	should := require.New(t)
 	should.Equal(8, writer.bufferSize)
 }

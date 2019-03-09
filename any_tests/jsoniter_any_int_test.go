@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/json-iterator/go"
+	jsoniter "github.com/json-iterator/go"
 	"github.com/stretchr/testify/require"
 )
 
@@ -126,7 +126,7 @@ func Test_read_int64_to_any(t *testing.T) {
 	should.Equal(true, any.ToBool())
 	should.Equal(any.ValueType(), jsoniter.NumberValue)
 	stream := jsoniter.NewStream(jsoniter.ConfigDefault, nil, 32)
-	any.WriteTo(stream)
+	any.WriteTo(stream, 0)
 	should.Equal("12345", string(stream.Buffer()))
 }
 func Test_read_int32_to_any(t *testing.T) {
@@ -144,7 +144,7 @@ func Test_read_int32_to_any(t *testing.T) {
 	should.Equal(true, any.ToBool())
 	should.Equal(any.ValueType(), jsoniter.NumberValue)
 	stream := jsoniter.NewStream(jsoniter.ConfigDefault, nil, 32)
-	any.WriteTo(stream)
+	any.WriteTo(stream, 0)
 	should.Equal("12345", string(stream.Buffer()))
 }
 
@@ -163,7 +163,7 @@ func Test_read_uint32_to_any(t *testing.T) {
 	should.Equal(true, any.ToBool())
 	should.Equal(any.ValueType(), jsoniter.NumberValue)
 	stream := jsoniter.NewStream(jsoniter.ConfigDefault, nil, 32)
-	any.WriteTo(stream)
+	any.WriteTo(stream, 0)
 	should.Equal("12345", string(stream.Buffer()))
 }
 
@@ -182,7 +182,7 @@ func Test_read_uint64_to_any(t *testing.T) {
 	should.Equal(true, any.ToBool())
 	should.Equal(any.ValueType(), jsoniter.NumberValue)
 	stream := jsoniter.NewStream(jsoniter.ConfigDefault, nil, 32)
-	any.WriteTo(stream)
+	any.WriteTo(stream, 0)
 	should.Equal("12345", string(stream.Buffer()))
 	stream = jsoniter.NewStream(jsoniter.ConfigDefault, nil, 32)
 	stream.WriteUint(uint(123))

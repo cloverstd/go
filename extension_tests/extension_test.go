@@ -1,13 +1,14 @@
 package test
 
 import (
-	"github.com/json-iterator/go"
-	"github.com/modern-go/reflect2"
-	"github.com/stretchr/testify/require"
 	"reflect"
 	"strconv"
 	"testing"
 	"unsafe"
+
+	jsoniter "github.com/json-iterator/go"
+	"github.com/modern-go/reflect2"
+	"github.com/stretchr/testify/require"
 )
 
 type TestObject1 struct {
@@ -23,7 +24,7 @@ func (extension *testExtension) UpdateStructDescriptor(structDescriptor *jsonite
 		return
 	}
 	binding := structDescriptor.GetField("Field1")
-	binding.Encoder = &funcEncoder{fun: func(ptr unsafe.Pointer, stream *jsoniter.Stream) {
+	binding.Encoder = &funcEncoder{fun: func(ptr unsafe.Pointer, stream *jsoniter.Stream, depth int) {
 		str := *((*string)(ptr))
 		val, _ := strconv.Atoi(str)
 		stream.WriteInt(val)
@@ -68,7 +69,7 @@ type testMapKeyExtension struct {
 func (extension *testMapKeyExtension) CreateMapKeyEncoder(typ reflect2.Type) jsoniter.ValEncoder {
 	if typ.Kind() == reflect.Int {
 		return &funcEncoder{
-			fun: func(ptr unsafe.Pointer, stream *jsoniter.Stream) {
+			fun: func(ptr unsafe.Pointer, stream *jsoniter.Stream, depth int) {
 				stream.WriteRaw(`"`)
 				stream.WriteInt(*(*int)(ptr) + 1)
 				stream.WriteRaw(`"`)
@@ -108,8 +109,8 @@ type funcEncoder struct {
 	isEmptyFunc func(ptr unsafe.Pointer) bool
 }
 
-func (encoder *funcEncoder) Encode(ptr unsafe.Pointer, stream *jsoniter.Stream) {
-	encoder.fun(ptr, stream)
+func (encoder *funcEncoder) Encode(ptr unsafe.Pointer, stream *jsoniter.Stream, depth int) {
+	encoder.fun(ptr, stream, depth)
 }
 
 func (encoder *funcEncoder) IsEmpty(ptr unsafe.Pointer) bool {

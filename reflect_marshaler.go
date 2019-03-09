@@ -3,8 +3,9 @@ package jsoniter
 import (
 	"encoding"
 	"encoding/json"
-	"github.com/modern-go/reflect2"
 	"unsafe"
+
+	"github.com/modern-go/reflect2"
 )
 
 var marshalerType = reflect2.TypeOfPtr((*json.Marshaler)(nil)).Elem()
@@ -87,7 +88,7 @@ type marshalerEncoder struct {
 	valType      reflect2.Type
 }
 
-func (encoder *marshalerEncoder) Encode(ptr unsafe.Pointer, stream *Stream) {
+func (encoder *marshalerEncoder) Encode(ptr unsafe.Pointer, stream *Stream, depth int) {
 	obj := encoder.valType.UnsafeIndirect(ptr)
 	if encoder.valType.IsNullable() && reflect2.IsNil(obj) {
 		stream.WriteNil()
@@ -109,7 +110,7 @@ type directMarshalerEncoder struct {
 	checkIsEmpty checkIsEmpty
 }
 
-func (encoder *directMarshalerEncoder) Encode(ptr unsafe.Pointer, stream *Stream) {
+func (encoder *directMarshalerEncoder) Encode(ptr unsafe.Pointer, stream *Stream, depth int) {
 	marshaler := *(*json.Marshaler)(ptr)
 	if marshaler == nil {
 		stream.WriteNil()
@@ -133,7 +134,7 @@ type textMarshalerEncoder struct {
 	checkIsEmpty  checkIsEmpty
 }
 
-func (encoder *textMarshalerEncoder) Encode(ptr unsafe.Pointer, stream *Stream) {
+func (encoder *textMarshalerEncoder) Encode(ptr unsafe.Pointer, stream *Stream, depth int) {
 	obj := encoder.valType.UnsafeIndirect(ptr)
 	if encoder.valType.IsNullable() && reflect2.IsNil(obj) {
 		stream.WriteNil()
@@ -145,7 +146,7 @@ func (encoder *textMarshalerEncoder) Encode(ptr unsafe.Pointer, stream *Stream) 
 		stream.Error = err
 	} else {
 		str := string(bytes)
-		encoder.stringEncoder.Encode(unsafe.Pointer(&str), stream)
+		encoder.stringEncoder.Encode(unsafe.Pointer(&str), stream, depth)
 	}
 }
 
@@ -158,7 +159,7 @@ type directTextMarshalerEncoder struct {
 	checkIsEmpty  checkIsEmpty
 }
 
-func (encoder *directTextMarshalerEncoder) Encode(ptr unsafe.Pointer, stream *Stream) {
+func (encoder *directTextMarshalerEncoder) Encode(ptr unsafe.Pointer, stream *Stream, depth int) {
 	marshaler := *(*encoding.TextMarshaler)(ptr)
 	if marshaler == nil {
 		stream.WriteNil()
@@ -169,7 +170,7 @@ func (encoder *directTextMarshalerEncoder) Encode(ptr unsafe.Pointer, stream *St
 		stream.Error = err
 	} else {
 		str := string(bytes)
-		encoder.stringEncoder.Encode(unsafe.Pointer(&str), stream)
+		encoder.stringEncoder.Encode(unsafe.Pointer(&str), stream, depth)
 	}
 }
 

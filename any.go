@@ -3,11 +3,12 @@ package jsoniter
 import (
 	"errors"
 	"fmt"
-	"github.com/modern-go/reflect2"
 	"io"
 	"reflect"
 	"strconv"
 	"unsafe"
+
+	"github.com/modern-go/reflect2"
 )
 
 // Any generic object representation.
@@ -31,7 +32,7 @@ type Any interface {
 	Size() int
 	Keys() []string
 	GetInterface() interface{}
-	WriteTo(stream *Stream)
+	WriteTo(stream *Stream, depth int)
 }
 
 type baseAny struct{}
@@ -291,10 +292,10 @@ func (codec *anyCodec) Decode(ptr unsafe.Pointer, iter *Iterator) {
 	panic("not implemented")
 }
 
-func (codec *anyCodec) Encode(ptr unsafe.Pointer, stream *Stream) {
+func (codec *anyCodec) Encode(ptr unsafe.Pointer, stream *Stream, depth int) {
 	obj := codec.valType.UnsafeIndirect(ptr)
 	any := obj.(Any)
-	any.WriteTo(stream)
+	any.WriteTo(stream, depth)
 }
 
 func (codec *anyCodec) IsEmpty(ptr unsafe.Pointer) bool {
@@ -310,13 +311,13 @@ func (codec *directAnyCodec) Decode(ptr unsafe.Pointer, iter *Iterator) {
 	*(*Any)(ptr) = iter.readAny()
 }
 
-func (codec *directAnyCodec) Encode(ptr unsafe.Pointer, stream *Stream) {
+func (codec *directAnyCodec) Encode(ptr unsafe.Pointer, stream *Stream, depth int) {
 	any := *(*Any)(ptr)
 	if any == nil {
 		stream.WriteNil()
 		return
 	}
-	any.WriteTo(stream)
+	any.WriteTo(stream, depth)
 }
 
 func (codec *directAnyCodec) IsEmpty(ptr unsafe.Pointer) bool {

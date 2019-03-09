@@ -2,10 +2,11 @@ package jsoniter
 
 import (
 	"fmt"
-	"github.com/modern-go/reflect2"
 	"io"
 	"reflect"
 	"unsafe"
+
+	"github.com/modern-go/reflect2"
 )
 
 func encoderOfStruct(ctx *ctx, typ reflect2.Type) ValEncoder {
@@ -105,10 +106,14 @@ type structFieldEncoder struct {
 	omitempty    bool
 }
 
-func (encoder *structFieldEncoder) Encode(ptr unsafe.Pointer, stream *Stream) {
+func (encoder *structFieldEncoder) Encode(ptr unsafe.Pointer, stream *Stream, depth int) {
+	if depth++; depth > MaxDepth {
+		stream.Error = newMaxDepthError(depth)
+		return
+	}
 	fieldPtr := encoder.field.UnsafeGet(ptr)
-	encoder.fieldEncoder.Encode(fieldPtr, stream)
-	if stream.Error != nil && stream.Error != io.EOF {
+	encoder.fieldEncoder.Encode(fieldPtr, stream, depth)
+	if stream.Error != nil && stream.Error != io.EOF && !IsMaxDepthError(stream.Error) {
 		stream.Error = fmt.Errorf("%s: %s", encoder.field.Name(), stream.Error.Error())
 	}
 }
@@ -141,7 +146,11 @@ type structFieldTo struct {
 	toName  string
 }
 
-func (encoder *structEncoder) Encode(ptr unsafe.Pointer, stream *Stream) {
+func (encoder *structEncoder) Encode(ptr unsafe.Pointer, stream *Stream, depth int) {
+	if depth++; depth > MaxDepth {
+		stream.Error = newMaxDepthError(depth)
+		return
+	}
 	stream.WriteObjectStart()
 	isNotFirst := false
 	for _, field := range encoder.fields {
@@ -155,11 +164,11 @@ func (encoder *structEncoder) Encode(ptr unsafe.Pointer, stream *Stream) {
 			stream.WriteMore()
 		}
 		stream.WriteObjectField(field.toName)
-		field.encoder.Encode(ptr, stream)
+		field.encoder.Encode(ptr, stream, depth)
 		isNotFirst = true
 	}
 	stream.WriteObjectEnd()
-	if stream.Error != nil && stream.Error != io.EOF {
+	if stream.Error != nil && stream.Error != io.EOF && !IsMaxDepthError(stream.Error) {
 		stream.Error = fmt.Errorf("%v.%s", encoder.typ, stream.Error.Error())
 	}
 }
@@ -171,7 +180,7 @@ func (encoder *structEncoder) IsEmpty(ptr unsafe.Pointer) bool {
 type emptyStructEncoder struct {
 }
 
-func (encoder *emptyStructEncoder) Encode(ptr unsafe.Pointer, stream *Stream) {
+func (encoder *emptyStructEncoder) Encode(ptr unsafe.Pointer, stream *Stream, depth int) {
 	stream.WriteEmptyObject()
 }
 
@@ -183,9 +192,9 @@ type stringModeNumberEncoder struct {
 	elemEncoder ValEncoder
 }
 
-func (encoder *stringModeNumberEncoder) Encode(ptr unsafe.Pointer, stream *Stream) {
+func (encoder *stringModeNumberEncoder) Encode(ptr unsafe.Pointer, stream *Stream, depth int) {
 	stream.writeByte('"')
-	encoder.elemEncoder.Encode(ptr, stream)
+	encoder.elemEncoder.Encode(ptr, stream, depth)
 	stream.writeByte('"')
 }
 
@@ -198,10 +207,10 @@ type stringModeStringEncoder struct {
 	cfg         *frozenConfig
 }
 
-func (encoder *stringModeStringEncoder) Encode(ptr unsafe.Pointer, stream *Stream) {
+func (encoder *stringModeStringEncoder) Encode(ptr unsafe.Pointer, stream *Stream, depth int) {
 	tempStream := encoder.cfg.BorrowStream(nil)
 	defer encoder.cfg.ReturnStream(tempStream)
-	encoder.elemEncoder.Encode(ptr, tempStream)
+	encoder.elemEncoder.Encode(ptr, tempStream, depth)
 	stream.WriteString(string(tempStream.Buffer()))
 }
 

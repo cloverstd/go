@@ -2,8 +2,9 @@ package jsoniter
 
 import (
 	"encoding/json"
-	"github.com/modern-go/reflect2"
 	"unsafe"
+
+	"github.com/modern-go/reflect2"
 )
 
 var jsonRawMessageType = reflect2.TypeOfPtr((*json.RawMessage)(nil)).Elem()
@@ -36,7 +37,7 @@ func (codec *jsonRawMessageCodec) Decode(ptr unsafe.Pointer, iter *Iterator) {
 	*((*json.RawMessage)(ptr)) = json.RawMessage(iter.SkipAndReturnBytes())
 }
 
-func (codec *jsonRawMessageCodec) Encode(ptr unsafe.Pointer, stream *Stream) {
+func (codec *jsonRawMessageCodec) Encode(ptr unsafe.Pointer, stream *Stream, depth int) {
 	stream.WriteRaw(string(*((*json.RawMessage)(ptr))))
 }
 
@@ -51,7 +52,7 @@ func (codec *jsoniterRawMessageCodec) Decode(ptr unsafe.Pointer, iter *Iterator)
 	*((*RawMessage)(ptr)) = RawMessage(iter.SkipAndReturnBytes())
 }
 
-func (codec *jsoniterRawMessageCodec) Encode(ptr unsafe.Pointer, stream *Stream) {
+func (codec *jsoniterRawMessageCodec) Encode(ptr unsafe.Pointer, stream *Stream, depth int) {
 	stream.WriteRaw(string(*((*RawMessage)(ptr))))
 }
 

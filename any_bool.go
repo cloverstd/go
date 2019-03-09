@@ -48,7 +48,7 @@ func (any *trueAny) ToString() string {
 	return "true"
 }
 
-func (any *trueAny) WriteTo(stream *Stream) {
+func (any *trueAny) WriteTo(stream *Stream, depth int) {
 	stream.WriteTrue()
 }
 
@@ -116,7 +116,7 @@ func (any *falseAny) ToString() string {
 	return "false"
 }
 
-func (any *falseAny) WriteTo(stream *Stream) {
+func (any *falseAny) WriteTo(stream *Stream, depth int) {
 	stream.WriteFalse()
 }
 

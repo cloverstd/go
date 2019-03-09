@@ -157,7 +157,7 @@ func (any *stringAny) ToString() string {
 	return any.val
 }
 
-func (any *stringAny) WriteTo(stream *Stream) {
+func (any *stringAny) WriteTo(stream *Stream, depth int) {
 	stream.WriteString(any.val)
 }
 

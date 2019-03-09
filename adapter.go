@@ -123,8 +123,8 @@ type Encoder struct {
 }
 
 // Encode encode interface{} as JSON to io.Writer
-func (adapter *Encoder) Encode(val interface{}) error {
-	adapter.stream.WriteVal(val)
+func (adapter *Encoder) Encode(val interface{}, depth int) error {
+	adapter.stream.WriteVal(val, depth)
 	adapter.stream.WriteRaw("\n")
 	adapter.stream.Flush()
 	return adapter.stream.Error

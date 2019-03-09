@@ -3,10 +3,11 @@ package test
 import (
 	"bytes"
 	"fmt"
-	"github.com/json-iterator/go"
-	"github.com/stretchr/testify/require"
 	"strconv"
 	"testing"
+
+	jsoniter "github.com/json-iterator/go"
+	"github.com/stretchr/testify/require"
 )
 
 func init() {
@@ -174,7 +175,7 @@ func Test_write_uint8(t *testing.T) {
 			should := require.New(t)
 			buf := &bytes.Buffer{}
 			stream := jsoniter.NewStream(jsoniter.ConfigDefault, buf, 4096)
-			stream.WriteVal(val)
+			stream.WriteVal(val, 0)
 			stream.Flush()
 			should.Nil(stream.Error)
 			should.Equal(strconv.FormatUint(uint64(val), 10), buf.String())
@@ -206,7 +207,7 @@ func Test_write_int8(t *testing.T) {
 			should := require.New(t)
 			buf := &bytes.Buffer{}
 			stream := jsoniter.NewStream(jsoniter.ConfigDefault, buf, 4096)
-			stream.WriteVal(val)
+			stream.WriteVal(val, 0)
 			stream.Flush()
 			should.Nil(stream.Error)
 			should.Equal(strconv.FormatInt(int64(val), 10), buf.String())
@@ -238,7 +239,7 @@ func Test_write_uint16(t *testing.T) {
 			should := require.New(t)
 			buf := &bytes.Buffer{}
 			stream := jsoniter.NewStream(jsoniter.ConfigDefault, buf, 4096)
-			stream.WriteVal(val)
+			stream.WriteVal(val, 0)
 			stream.Flush()
 			should.Nil(stream.Error)
 			should.Equal(strconv.FormatUint(uint64(val), 10), buf.String())
@@ -270,7 +271,7 @@ func Test_write_int16(t *testing.T) {
 			should := require.New(t)
 			buf := &bytes.Buffer{}
 			stream := jsoniter.NewStream(jsoniter.ConfigDefault, buf, 4096)
-			stream.WriteVal(val)
+			stream.WriteVal(val, 0)
 			stream.Flush()
 			should.Nil(stream.Error)
 			should.Equal(strconv.FormatInt(int64(val), 10), buf.String())
@@ -302,7 +303,7 @@ func Test_write_uint32(t *testing.T) {
 			should := require.New(t)
 			buf := &bytes.Buffer{}
 			stream := jsoniter.NewStream(jsoniter.ConfigDefault, buf, 4096)
-			stream.WriteVal(val)
+			stream.WriteVal(val, 0)
 			stream.Flush()
 			should.Nil(stream.Error)
 			should.Equal(strconv.FormatUint(uint64(val), 10), buf.String())
@@ -334,7 +335,7 @@ func Test_write_int32(t *testing.T) {
 			should := require.New(t)
 			buf := &bytes.Buffer{}
 			stream := jsoniter.NewStream(jsoniter.ConfigDefault, buf, 4096)
-			stream.WriteVal(val)
+			stream.WriteVal(val, 0)
 			stream.Flush()
 			should.Nil(stream.Error)
 			should.Equal(strconv.FormatInt(int64(val), 10), buf.String())
@@ -368,7 +369,7 @@ func Test_write_uint64(t *testing.T) {
 			should := require.New(t)
 			buf := &bytes.Buffer{}
 			stream := jsoniter.NewStream(jsoniter.ConfigDefault, buf, 4096)
-			stream.WriteVal(val)
+			stream.WriteVal(val, 0)
 			stream.Flush()
 			should.Nil(stream.Error)
 			should.Equal(strconv.FormatUint(uint64(val), 10), buf.String())
@@ -402,7 +403,7 @@ func Test_write_int64(t *testing.T) {
 			should := require.New(t)
 			buf := &bytes.Buffer{}
 			stream := jsoniter.NewStream(jsoniter.ConfigDefault, buf, 4096)
-			stream.WriteVal(val)
+			stream.WriteVal(val, 0)
 			stream.Flush()
 			should.Nil(stream.Error)
 			should.Equal(strconv.FormatInt(val, 10), buf.String())

@@ -2,9 +2,10 @@ package jsoniter
 
 import (
 	"fmt"
-	"github.com/modern-go/reflect2"
 	"io"
 	"unsafe"
+
+	"github.com/modern-go/reflect2"
 )
 
 func decoderOfArray(ctx *ctx, typ reflect2.Type) ValDecoder {
@@ -24,7 +25,7 @@ func encoderOfArray(ctx *ctx, typ reflect2.Type) ValEncoder {
 
 type emptyArrayEncoder struct{}
 
-func (encoder emptyArrayEncoder) Encode(ptr unsafe.Pointer, stream *Stream) {
+func (encoder emptyArrayEncoder) Encode(ptr unsafe.Pointer, stream *Stream, depth int) {
 	stream.WriteEmptyArray()
 }
 
@@ -37,17 +38,21 @@ type arrayEncoder struct {
 	elemEncoder ValEncoder
 }
 
-func (encoder *arrayEncoder) Encode(ptr unsafe.Pointer, stream *Stream) {
+func (encoder *arrayEncoder) Encode(ptr unsafe.Pointer, stream *Stream, depth int) {
+	if depth++; depth > MaxDepth {
+		stream.Error = newMaxDepthError(depth)
+		return
+	}
 	stream.WriteArrayStart()
 	elemPtr := unsafe.Pointer(ptr)
-	encoder.elemEncoder.Encode(elemPtr, stream)
+	encoder.elemEncoder.Encode(elemPtr, stream, depth)
 	for i := 1; i < encoder.arrayType.Len(); i++ {
 		stream.WriteMore()
 		elemPtr = encoder.arrayType.UnsafeGetIndex(ptr, i)
-		encoder.elemEncoder.Encode(elemPtr, stream)
+		encoder.elemEncoder.Encode(elemPtr, stream, depth)
 	}
 	stream.WriteArrayEnd()
-	if stream.Error != nil && stream.Error != io.EOF {
+	if stream.Error != nil && stream.Error != io.EOF && IsMaxDepthError(stream.Error) {
 		stream.Error = fmt.Errorf("%v: %s", encoder.arrayType, stream.Error.Error())
 	}
 }

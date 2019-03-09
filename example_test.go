@@ -58,7 +58,7 @@ func ExampleConfigFastest_Marshal() {
 	}
 	stream := ConfigFastest.BorrowStream(nil)
 	defer ConfigFastest.ReturnStream(stream)
-	stream.WriteVal(group)
+	stream.WriteVal(group, 0)
 	if stream.Error != nil {
 		fmt.Println("error:", stream.Error)
 	}

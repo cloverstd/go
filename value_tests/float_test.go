@@ -4,10 +4,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/json-iterator/go"
-	"github.com/stretchr/testify/require"
 	"strconv"
 	"testing"
+
+	jsoniter "github.com/json-iterator/go"
+	"github.com/stretchr/testify/require"
 )
 
 func Test_read_float(t *testing.T) {
@@ -69,7 +70,7 @@ func Test_write_float32(t *testing.T) {
 			should := require.New(t)
 			buf := &bytes.Buffer{}
 			stream := jsoniter.NewStream(jsoniter.ConfigDefault, buf, 4096)
-			stream.WriteVal(val)
+			stream.WriteVal(val, 0)
 			stream.Flush()
 			should.Nil(stream.Error)
 			output, err := json.Marshal(val)
@@ -108,7 +109,7 @@ func Test_write_float64(t *testing.T) {
 			should := require.New(t)
 			buf := &bytes.Buffer{}
 			stream := jsoniter.NewStream(jsoniter.ConfigDefault, buf, 4096)
-			stream.WriteVal(val)
+			stream.WriteVal(val, 0)
 			stream.Flush()
 			should.Nil(stream.Error)
 			should.Equal(strconv.FormatFloat(val, 'f', -1, 64), buf.String())
