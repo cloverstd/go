@@ -84,10 +84,6 @@ func (stream *Stream) WriteVal(val interface{}, depth int) {
 		stream.WriteNil()
 		return
 	}
-	if depth++; depth > MaxDepth {
-		stream.Error = newMaxDepthError(depth)
-		return
-	}
 	cacheKey := reflect2.RTypeOf(val)
 	encoder := stream.cfg.getEncoderFromCache(cacheKey)
 	if encoder == nil {
