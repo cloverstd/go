@@ -36,7 +36,11 @@ func (encoder *sliceEncoder) Encode(ptr unsafe.Pointer, stream *Stream, depth in
 		return
 	}
 	if depth++; depth > MaxDepth {
-		stream.Error = newMaxDepthError(depth)
+		if errorOnDepthOverflow {
+			stream.Error = newMaxDepthError(depth)
+		} else {
+			stream.WriteEmptyArray()
+		}
 		return
 	}
 	stream.WriteArrayStart()

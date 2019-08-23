@@ -284,17 +284,28 @@ func (encoder *sortKeysMapEncoder) Encode(ptr unsafe.Pointer, stream *Stream, de
 		stream.WriteNil()
 		return
 	}
-	stream.WriteObjectStart()
+	depth++
+	overflow := depth > MaxDepth
+	if overflow && !errorOnDepthOverflow {
+		stream.WriteEmptyObject()
+		return
+	}
 	mapIter := encoder.mapType.UnsafeIterate(ptr)
 	subStream := stream.cfg.BorrowStream(nil)
 	subIter := stream.cfg.BorrowIterator(nil)
 	keyValues := encodedKeyValues{}
+	stream.WriteObjectStart()
 	for mapIter.HasNext() {
+		if overflow {
+			stream.Error = newMaxDepthError(depth)
+			goto end
+		}
 		subStream.buf = make([]byte, 0, 64)
 		key, elem := mapIter.UnsafeNext()
 		encoder.keyEncoder.Encode(key, subStream, depth)
 		if subStream.Error != nil && subStream.Error != io.EOF && stream.Error == nil {
 			stream.Error = subStream.Error
+			goto end
 		}
 		encodedKey := subStream.Buffer()
 		subIter.ResetBytes(encodedKey)
@@ -305,6 +316,10 @@ func (encoder *sortKeysMapEncoder) Encode(ptr unsafe.Pointer, stream *Stream, de
 			subStream.writeByte(':')
 		}
 		encoder.elemEncoder.Encode(elem, subStream, depth)
+		if subStream.Error != nil && subStream.Error != io.EOF && stream.Error == nil {
+			stream.Error = subStream.Error
+			goto end
+		}
 		keyValues = append(keyValues, encodedKV{
 			key:      decodedKey,
 			keyValue: subStream.Buffer(),
@@ -317,6 +332,7 @@ func (encoder *sortKeysMapEncoder) Encode(ptr unsafe.Pointer, stream *Stream, de
 		}
 		stream.Write(keyValue.keyValue)
 	}
+end:
 	stream.WriteObjectEnd()
 	stream.cfg.ReturnStream(subStream)
 	stream.cfg.ReturnIterator(subIter)

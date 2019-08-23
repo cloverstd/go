@@ -147,8 +147,10 @@ type structFieldTo struct {
 }
 
 func (encoder *structEncoder) Encode(ptr unsafe.Pointer, stream *Stream, depth int) {
-	if depth++; depth > MaxDepth {
-		stream.Error = newMaxDepthError(depth)
+	depth++
+	overflow := depth > MaxDepth
+	if overflow && !errorOnDepthOverflow {
+		stream.WriteEmptyObject()
 		return
 	}
 	stream.WriteObjectStart()
@@ -159,6 +161,10 @@ func (encoder *structEncoder) Encode(ptr unsafe.Pointer, stream *Stream, depth i
 		}
 		if field.encoder.IsEmbeddedPtrNil(ptr) {
 			continue
+		}
+		if overflow {
+			stream.Error = newMaxDepthError(depth)
+			break
 		}
 		if isNotFirst {
 			stream.WriteMore()

@@ -4,6 +4,8 @@ import "fmt"
 
 var MaxDepth = 1024
 
+var errorOnDepthOverflow = true
+
 type MaxDepthError struct {
 	depth int
 }
@@ -21,4 +23,8 @@ func newMaxDepthError(depth int) error {
 	return MaxDepthError{
 		depth,
 	}
+}
+
+func SetErrorOnDepthOverflow(e bool) {
+	errorOnDepthOverflow = e
 }

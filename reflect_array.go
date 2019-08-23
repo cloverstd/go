@@ -40,7 +40,11 @@ type arrayEncoder struct {
 
 func (encoder *arrayEncoder) Encode(ptr unsafe.Pointer, stream *Stream, depth int) {
 	if depth++; depth > MaxDepth {
-		stream.Error = newMaxDepthError(depth)
+		if errorOnDepthOverflow {
+			stream.Error = newMaxDepthError(depth)
+		} else {
+			stream.WriteEmptyArray()
+		}
 		return
 	}
 	stream.WriteArrayStart()
@@ -52,7 +56,7 @@ func (encoder *arrayEncoder) Encode(ptr unsafe.Pointer, stream *Stream, depth in
 		encoder.elemEncoder.Encode(elemPtr, stream, depth)
 	}
 	stream.WriteArrayEnd()
-	if stream.Error != nil && stream.Error != io.EOF && IsMaxDepthError(stream.Error) {
+	if stream.Error != nil && stream.Error != io.EOF && !IsMaxDepthError(stream.Error) {
 		stream.Error = fmt.Errorf("%v: %s", encoder.arrayType, stream.Error.Error())
 	}
 }
